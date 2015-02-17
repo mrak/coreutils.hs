@@ -1,32 +1,45 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 import qualified Data.ByteString.Lazy.Char8 as L
-import Args
+import Data.Int
+import qualified Args as A (Args(..), getArgs)
 
 main :: IO ()
 main = do
-    args <- getArgs
+    args <- A.getArgs
     L.interact $ wc args
 
-wc :: Args -> L.ByteString -> L.ByteString
-wc _ xs = let ls = linecount xs
-              ws = wordcount xs
-              cs = charcount xs
-              bs = bytecount xs
-              ll = longest xs
-          in  L.concat [ls,ws,cs,bs,ll]
+wc :: A.Args -> L.ByteString -> L.ByteString
+wc a xs = let ls = if A.lines a then disp $ linecount xs
+                                else ""
+              ws = if A.words a then disp $ wordcount xs
+                                else ""
+              cs = if A.chars a then disp $ charcount xs
+                                else ""
+              bs = if A.bytes a then disp $ bytecount xs
+                                else ""
+              ll = if A.longest a then disp $ longest xs
+                                  else ""
+          in  L.concat [ls,ws,cs,bs,ll,"\n"]
 
-linecount :: L.ByteString -> L.ByteString
-linecount = L.pack . show . L.count '\n'
+linecount :: L.ByteString -> Int64
+linecount = L.count '\n'
 
-wordcount :: L.ByteString -> L.ByteString
-wordcount = L.pack . show . length . L.words
+wordcount :: L.ByteString -> Int
+wordcount = length . L.words
 
-charcount :: L.ByteString -> L.ByteString
-charcount = L.pack . show . length . L.unpack
+charcount :: L.ByteString -> Int
+charcount = length . L.unpack
 
-bytecount :: L.ByteString -> L.ByteString
-bytecount = L.pack . show . L.length
+bytecount :: L.ByteString -> Int64
+bytecount = L.length
 
-longest :: L.ByteString -> L.ByteString
-longest = L.pack . show . maximum . map L.length . L.lines
+longest :: L.ByteString -> Int
+longest = maximum . map length . lines . L.unpack
+
+disp :: Show a => a -> L.ByteString
+disp = pad 8 ' ' . L.pack . show
+
+pad :: Int64 -> Char -> L.ByteString -> L.ByteString
+pad w c s = L.append (L.replicate n c) s
+    where n = w - L.length s

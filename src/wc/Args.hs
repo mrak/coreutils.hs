@@ -1,4 +1,5 @@
 module Args (Args(..), getArgs) where
+import Prelude hiding (words,lines)
 import Options.Applicative
 
 data Args = Args
@@ -53,7 +54,8 @@ options = Args
     <*> longestFlag
 
 getArgs :: IO Args
-getArgs = execParser $ info (helper <*> options)
-    ( fullDesc
-   <> header ""
-    )
+getArgs = do
+    a <- execParser $ info (helper <*> options) ( fullDesc <> header "")
+    if   bytes a || words a || lines a || chars a || longest a
+    then return a
+    else return a { bytes = True, words = True, lines = True }
