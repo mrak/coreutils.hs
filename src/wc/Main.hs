@@ -1,8 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
-import qualified Data.ByteString.Lazy.Char8 as L
 import Data.Int
+import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Args as A (Args(..), getArgs)
+import qualified Data.Text.Lazy.Encoding as E
+import qualified Data.Text.Lazy as T
 
 main :: IO ()
 main = do
@@ -28,8 +30,8 @@ linecount = L.count '\n'
 wordcount :: L.ByteString -> Int
 wordcount = length . L.words
 
-charcount :: L.ByteString -> Int
-charcount = length . L.unpack
+charcount :: L.ByteString -> Int64
+charcount = T.length . E.decodeUtf8
 
 bytecount :: L.ByteString -> Int64
 bytecount = L.length
