@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 import Data.Int
-import qualified Data.ByteString.Lazy.Char8 as L
+import qualified Data.ByteString.Lazy.Char8 as B
 import qualified Args as A (Args(..), getArgs)
 import qualified Data.Text.Lazy.Encoding as E
 import qualified Data.Text.Lazy as T
@@ -9,9 +9,9 @@ import qualified Data.Text.Lazy as T
 main :: IO ()
 main = do
     args <- A.getArgs
-    L.interact $ wc args
+    B.interact $ wc args
 
-wc :: A.Args -> L.ByteString -> L.ByteString
+wc :: A.Args -> B.ByteString -> B.ByteString
 wc a xs = let ls = if A.lines a then disp $ linecount xs
                                 else ""
               ws = if A.words a then disp $ wordcount xs
@@ -22,30 +22,30 @@ wc a xs = let ls = if A.lines a then disp $ linecount xs
                                 else ""
               ll = if A.longest a then disp $ longest xs
                                   else ""
-          in  trim . L.drop 1 . L.concat $ [ls,ws,cs,bs,ll,"\n"]
-          where trim bs = if   (length . L.words) bs == 1
-                          then L.dropWhile isSpace bs
+          in  trim . B.drop 1 . B.concat $ [ls,ws,cs,bs,ll,"\n"]
+          where trim bs = if   (length . B.words) bs == 1
+                          then B.dropWhile isSpace bs
                           else bs
                 isSpace = (== ' ')
 
-linecount :: L.ByteString -> Int64
-linecount = L.count '\n'
+linecount :: B.ByteString -> Int64
+linecount = B.count '\n'
 
-wordcount :: L.ByteString -> Int
-wordcount = length . L.words
+wordcount :: B.ByteString -> Int
+wordcount = length . B.words
 
-charcount :: L.ByteString -> Int64
+charcount :: B.ByteString -> Int64
 charcount = T.length . E.decodeUtf8
 
-bytecount :: L.ByteString -> Int64
-bytecount = L.length
+bytecount :: B.ByteString -> Int64
+bytecount = B.length
 
-longest :: L.ByteString -> Int64
+longest :: B.ByteString -> Int64
 longest = maximum . map T.length . T.lines . E.decodeUtf8
 
-disp :: Show a => a -> L.ByteString
-disp = pad 8 ' ' . L.pack . show
+disp :: Show a => a -> B.ByteString
+disp = pad 8 ' ' . B.pack . show
 
-pad :: Int64 -> Char -> L.ByteString -> L.ByteString
-pad w c s = L.append (L.replicate n c) s
-    where n = w - L.length s
+pad :: Int64 -> Char -> B.ByteString -> B.ByteString
+pad w c s = B.append (B.replicate n c) s
+    where n = w - B.length s
