@@ -22,7 +22,11 @@ wc a xs = let ls = if A.lines a then disp $ linecount xs
                                 else ""
               ll = if A.longest a then disp $ longest xs
                                   else ""
-          in  L.concat [ls,ws,cs,bs,ll,"\n"]
+          in  trim . L.drop 1 . L.concat $ [ls,ws,cs,bs,ll,"\n"]
+          where trim bs = if   (length . L.words) bs == 1
+                          then L.dropWhile isSpace bs
+                          else bs
+                isSpace = (== ' ')
 
 linecount :: L.ByteString -> Int64
 linecount = L.count '\n'
@@ -36,8 +40,8 @@ charcount = T.length . E.decodeUtf8
 bytecount :: L.ByteString -> Int64
 bytecount = L.length
 
-longest :: L.ByteString -> Int
-longest = maximum . map length . lines . L.unpack
+longest :: L.ByteString -> Int64
+longest = maximum . map T.length . T.lines . E.decodeUtf8
 
 disp :: Show a => a -> L.ByteString
 disp = pad 8 ' ' . L.pack . show
