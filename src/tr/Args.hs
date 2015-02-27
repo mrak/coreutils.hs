@@ -1,7 +1,7 @@
 module Args (Args(..), getArgs) where
 import Options.Applicative
 
-data Args = Args
+data CLIArgs = CLIArgs
     { complement :: Bool
     , delete :: Bool
     , squeeze :: Bool
@@ -10,6 +10,12 @@ data Args = Args
     , set2 :: Maybe String
     } deriving Show
 
+data Args = Args
+    { mode :: Mode
+    , squeeze_set :: Maybe String
+    }
+
+data Mode = Translate | Delete | None
 
 complementFlag :: Parser Bool
 complementFlag = switch
@@ -46,8 +52,8 @@ set1Arg = argument str (metavar "SET1")
 set2Arg :: Parser (Maybe String)
 set2Arg = optional $ argument str (metavar "SET2")
 
-options :: Parser Args
-options = Args
+options :: Parser CLIArgs
+options = CLIArgs
     <$> complementFlag
     <*> deleteFlag
     <*> squeezeFlag
@@ -55,8 +61,9 @@ options = Args
     <*> set1Arg
     <*> set2Arg
 
+validateArgs :: CLIArgs -> IO Args
+validateArgs cas = return $ Args {mode=Translate, squeeze_set=Nothing}
+
 getArgs :: IO Args
-getArgs = execParser $ info (helper <*> options)
-    ( fullDesc
-   <> header ""
-    )
+getArgs = execParser parser >>= validateArgs
+    where parser = info (helper <*> options) (fullDesc <> header "")
