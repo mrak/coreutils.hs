@@ -8,6 +8,7 @@ data Args = Args
     , lines :: Bool
     , words :: Bool
     , longest :: Bool
+    , files :: Maybe [String]
     } deriving Show
 
 bytesFlag :: Parser Bool
@@ -45,6 +46,9 @@ longestFlag = switch
    <> help "print the length of the longest line"
     )
 
+fileArgs :: Parser (Maybe [String])
+fileArgs = optional $ some $ argument str (metavar "FILES...")
+
 options :: Parser Args
 options = Args
     <$> bytesFlag
@@ -52,6 +56,7 @@ options = Args
     <*> linesFlag
     <*> wordsFlag
     <*> longestFlag
+    <*> fileArgs
 
 getArgs :: IO Args
 getArgs = do
