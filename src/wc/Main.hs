@@ -5,7 +5,6 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import qualified Args as A (Args(..), getArgs)
 import qualified Data.Text.Lazy.Encoding as E
 import qualified Data.Text.Lazy as T
-import Control.Applicative
 
 main :: IO ()
 main = do
@@ -13,7 +12,7 @@ main = do
     case A.files args of
          Nothing -> B.interact (wc args) >> B.putStrLn ""
          Just fs -> mapM_ func fs
-            where func f = wc args <$> B.readFile f >>= putResult f
+            where func f = fmap (wc args) (B.readFile f) >>= putResult f
                   putResult f b = B.putStrLn $ B.concat [b, " ", B.pack f]
 
 wc :: A.Args -> B.ByteString -> B.ByteString
