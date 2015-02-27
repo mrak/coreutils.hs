@@ -1,0 +1,8 @@
+ghc:
+  - 7.8
+  - 7.10
+install:
+  - pip install cram
+  - cabal install --only-dependencies
+script:
+  - cabal configure && cabal build && cram tests
