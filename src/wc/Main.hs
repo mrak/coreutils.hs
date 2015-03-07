@@ -7,6 +7,7 @@ import qualified Data.Text.Lazy.Encoding as E
 import qualified Data.Text.Lazy as T
 import Data.Maybe (isJust, fromJust)
 import Control.Applicative
+import Data.Monoid
 
 data Result = Result
     (Maybe Int64)
@@ -15,39 +16,35 @@ data Result = Result
     (Maybe Int64)
     (Maybe Int64)
 
-defaultResult :: Result
-defaultResult = Result
-    (Just 0)
-    (Just 0)
-    (Just 0)
-    (Just 0)
-    (Just 0)
+instance Monoid Result where
+    mempty = Result (Just 0) (Just 0) (Just 0) (Just 0) (Just 0)
+    mappend (Result ls1 ws1 cs1 bs1 ll1) (Result ls2 ws2 cs2 bs2 ll2) =
+        Result
+        ((+) <$> ls1 <*> ls2)
+        ((+) <$> ws1 <*> ws2)
+        ((+) <$> cs1 <*> cs2)
+        ((+) <$> bs1 <*> bs2)
+        ((+) <$> ll1 <*> ll2)
 
 instance Show Result where
-    show (Result ls ws cs bs ll) = concat . map (pad 8 ' ' . show . fromJust) $ filter isJust [ls,(fromIntegral <$> ws),cs,bs,ll]
+    show (Result ls ws cs bs ll) = concat . maybePad $ filter isJust [ls,(fromIntegral <$> ws),cs,bs,ll]
+        where maybePad (s:[]) = [show . fromJust $ s]
+              maybePad ss = map (pad 8 ' ' . show . fromJust) ss
 
 main :: IO ()
 main = do
     args <- A.getArgs
     case A.files args of
-         Nothing -> B.getContents >>= (print . wc args) >> putStrLn ""
-         Just fs -> mapM_ func fs
-            where func f = wcFile args f >>= putResult f
-                  putResult f r = putStrLn $ concat [show r," ",f]
+         Nothing -> B.getContents >>= print . wc args
+         Just fs -> wcFiles args fs >>= putStr . unlines . labelResults fs
 
-wcFile :: A.Args -> FilePath -> IO (Result)
-wcFile a f = fmap (wc a) (B.readFile f)
+wcFiles :: A.Args -> [FilePath] -> IO ([Result])
+wcFiles args fs = mapM (wcFile args) fs
+    where wcFile a f = fmap (wc a) (B.readFile f)
 
-labelResults :: [Result] -> [FilePath] -> [String]
-labelResults rs fs = zipWith (\r f -> show r ++ " " ++ f) (rs ++ [tally rs]) (fs ++ ["total"])
-    where tally = foldr (addResults) defaultResult
-          addResults (Result ls1 ws1 cs1 bs1 ll1) (Result ls2 ws2 cs2 bs2 ll2) =
-              Result
-              ((+) <$> ls1 <*> ls2)
-              ((+) <$> ws1 <*> ws2)
-              ((+) <$> cs1 <*> cs2)
-              ((+) <$> bs1 <*> bs2)
-              ((+) <$> ll1 <*> ll2)
+labelResults :: [FilePath] -> [Result] -> [String]
+labelResults fs rs = zipWith (\r f -> show r ++ " " ++ f) (rs ++ [tally rs]) (fs ++ ["total"])
+    where tally = foldr (<>) mempty
 
 wc :: A.Args -> B.ByteString -> Result
 wc a xs = let ls = if A.lines a then Just $ linecount xs
