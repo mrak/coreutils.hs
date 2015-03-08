@@ -8,6 +8,7 @@ import qualified Data.Text.Lazy as T
 import Data.Maybe (isJust, fromJust)
 import Control.Applicative
 import Data.Monoid
+import Data.List (intersperse)
 
 data Result = Result
     (Maybe Int64)
@@ -27,9 +28,9 @@ instance Monoid Result where
         ((+) <$> ll1 <*> ll2)
 
 instance Show Result where
-    show (Result ls ws cs bs ll) = concat . maybePad $ filter isJust [ls,ws,cs,bs,ll]
-        where maybePad (s:[]) = [show . fromJust $ s]
-              maybePad ss = map (pad 8 ' ' . show . fromJust) ss
+    show (Result ls ws cs bs ll) = concat . maybePad $ map (show . fromJust) $ filter isJust [ls,ws,cs,bs,ll]
+        where maybePad (s:[]) = [s]
+              maybePad ss = intersperse " " $ map (pad 7 ' ') ss
 
 main :: IO ()
 main = do
@@ -43,6 +44,7 @@ wcFiles args fs = mapM (wcFile args) fs
     where wcFile a f = fmap (wc a) (B.readFile f)
 
 labelResults :: [FilePath] -> [Result] -> [String]
+labelResults (f:[]) (r:[]) = [show r ++ " " ++ f]
 labelResults fs rs = zipWith (\r f -> show r ++ " " ++ f) (rs ++ [tally rs]) (fs ++ ["total"])
     where tally = foldr (<>) mempty
 
