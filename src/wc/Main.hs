@@ -11,7 +11,7 @@ import Data.Monoid
 
 data Result = Result
     (Maybe Int64)
-    (Maybe Int)
+    (Maybe Int64)
     (Maybe Int64)
     (Maybe Int64)
     (Maybe Int64)
@@ -27,7 +27,7 @@ instance Monoid Result where
         ((+) <$> ll1 <*> ll2)
 
 instance Show Result where
-    show (Result ls ws cs bs ll) = concat . maybePad $ filter isJust [ls,(fromIntegral <$> ws),cs,bs,ll]
+    show (Result ls ws cs bs ll) = concat . maybePad $ filter isJust [ls,ws,cs,bs,ll]
         where maybePad (s:[]) = [show . fromJust $ s]
               maybePad ss = map (pad 8 ' ' . show . fromJust) ss
 
@@ -47,23 +47,18 @@ labelResults fs rs = zipWith (\r f -> show r ++ " " ++ f) (rs ++ [tally rs]) (fs
     where tally = foldr (<>) mempty
 
 wc :: A.Args -> B.ByteString -> Result
-wc a xs = let ls = if A.lines a then Just $ linecount xs
-                                else Nothing
-              ws = if A.words a then Just $ wordcount xs
-                                else Nothing
-              cs = if A.chars a then Just $ charcount xs
-                                else Nothing
-              bs = if A.bytes a then Just $ bytecount xs
-                                else Nothing
-              ll = if A.longest a then Just $ longest xs
-                                  else Nothing
+wc a xs = let ls = if A.lines a then Just $ linecount xs else Nothing
+              ws = if A.words a then Just $ wordcount xs else Nothing
+              cs = if A.chars a then Just $ charcount xs else Nothing
+              bs = if A.bytes a then Just $ bytecount xs else Nothing
+              ll = if A.longest a then Just $ longest xs else Nothing
           in Result ls ws cs bs ll
 
 linecount :: B.ByteString -> Int64
 linecount = B.count '\n'
 
-wordcount :: B.ByteString -> Int
-wordcount = length . B.words
+wordcount :: B.ByteString -> Int64
+wordcount = fromIntegral . length . B.words
 
 charcount :: B.ByteString -> Int64
 charcount = T.length . E.decodeUtf8
