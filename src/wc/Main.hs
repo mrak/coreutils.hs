@@ -1,21 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
-    import Data.Int
-    import qualified Data.ByteString.Lazy.Char8 as B
-    import qualified Args as A
-    import qualified Data.Text.Lazy.Encoding as E
-    import qualified Data.Text.Lazy as T
-    import Data.Maybe (isJust, fromJust)
-    import Control.Applicative
-    import Data.Monoid
-    import Data.List (intersperse)
 
-data Result = Result
-(Maybe Int64)
-(Maybe Int64)
-(Maybe Int64)
-(Maybe Int64)
-(Maybe Int64)
+import Data.Int
+import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Args as A
+import qualified Data.Text.Lazy.Encoding as E
+import qualified Data.Text.Lazy as T
+import Data.Maybe (isJust, fromJust)
+import Control.Applicative
+import Data.Monoid
+import Data.List (intersperse)
+
+data Result =
+    Result
+    (Maybe Int64)
+    (Maybe Int64)
+    (Maybe Int64)
+    (Maybe Int64)
+    (Maybe Int64)
 
 instance Monoid Result where
     mempty = Result (Just 0) (Just 0) (Just 0) (Just 0) (Just 0)
@@ -28,25 +30,40 @@ instance Monoid Result where
         ((+) <$> ll1 <*> ll2)
 
 instance Show Result where
-    show (Result ls ws cs bs ll) = concat . maybePad $ map (show . fromJust) $ filter isJust [ls,ws,cs,bs,ll]
+    show r = concat . maybePad $ filterShow r
       where maybePad (s:[]) = [s]
             maybePad ss = intersperse " " $ map (pad 7 ' ') ss
+
+filterShow :: Result -> [String]
+filterShow (Result ls ws cs bs ll) = map (show . fromJust) (filter isJust [ls,ws,cs,bs,ll])
 
 main :: IO ()
 main = do
     args <- A.getArgs
     case A.files args of
-         Nothing -> B.getContents >>= print . wc args
-         Just fs -> wcFiles args fs >>= putStr . unlines . labelResults fs
+         Nothing -> print . wc args =<< B.getContents
+         Just fs -> putStr . unlines . labelResults fs . appendTotal =<< wcFiles args fs
 
 wcFiles :: A.Args -> [FilePath] -> IO ([Result])
 wcFiles args fs = mapM (wcFile args) fs
   where wcFile a f = fmap (wc a) (B.readFile f)
 
+appendTotal :: [Result] -> [Result]
+appendTotal (r:[]) = [r]
+appendTotal rs = rs ++ [foldr (<>) mempty rs]
+
+calcPadding :: [Result] -> Int
+calcPadding rs = foldr (foldfn) 0 rs
+    where foldfn r a = maximum $ a:(map (length) (filterShow r))
+
 labelResults :: [FilePath] -> [Result] -> [String]
-labelResults (f:[]) (r:[]) = [show r ++ " " ++ f]
-labelResults fs rs = zipWith (\r f -> show r ++ " " ++ f) (rs ++ [tally rs]) (fs ++ ["total"])
-  where tally = foldr (<>) mempty
+labelResults fs rs = zipWith (showWithFile padding) (appendTotal rs) (fs ++ ["total"])
+  where padding = calcPadding rs
+
+showWithFile :: Int -> Result -> FilePath -> String
+showWithFile p r f = (concat . maybePad $ filterShow r) ++ " " ++ f
+  where maybePad (s:[]) = [s]
+        maybePad ss = intersperse " " $ map (pad p ' ') ss
 
 wc :: A.Args -> B.ByteString -> Result
 wc a xs = let ls = if A.lines a then Just (linecount xs) else Nothing
