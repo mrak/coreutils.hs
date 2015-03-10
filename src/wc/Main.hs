@@ -1,21 +1,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
-import Data.Int
-import qualified Data.ByteString.Lazy.Char8 as B
-import qualified Args as A
-import qualified Data.Text.Lazy.Encoding as E
-import qualified Data.Text.Lazy as T
-import Data.Maybe (isJust, fromJust)
-import Control.Applicative
-import Data.Monoid
-import Data.List (intersperse)
+    import Data.Int
+    import qualified Data.ByteString.Lazy.Char8 as B
+    import qualified Args as A
+    import qualified Data.Text.Lazy.Encoding as E
+    import qualified Data.Text.Lazy as T
+    import Data.Maybe (isJust, fromJust)
+    import Control.Applicative
+    import Data.Monoid
+    import Data.List (intersperse)
 
 data Result = Result
-    (Maybe Int64)
-    (Maybe Int64)
-    (Maybe Int64)
-    (Maybe Int64)
-    (Maybe Int64)
+(Maybe Int64)
+(Maybe Int64)
+(Maybe Int64)
+(Maybe Int64)
+(Maybe Int64)
 
 instance Monoid Result where
     mempty = Result (Just 0) (Just 0) (Just 0) (Just 0) (Just 0)
@@ -29,8 +29,8 @@ instance Monoid Result where
 
 instance Show Result where
     show (Result ls ws cs bs ll) = concat . maybePad $ map (show . fromJust) $ filter isJust [ls,ws,cs,bs,ll]
-        where maybePad (s:[]) = [s]
-              maybePad ss = intersperse " " $ map (pad 7 ' ') ss
+      where maybePad (s:[]) = [s]
+            maybePad ss = intersperse " " $ map (pad 7 ' ') ss
 
 main :: IO ()
 main = do
@@ -41,20 +41,20 @@ main = do
 
 wcFiles :: A.Args -> [FilePath] -> IO ([Result])
 wcFiles args fs = mapM (wcFile args) fs
-    where wcFile a f = fmap (wc a) (B.readFile f)
+  where wcFile a f = fmap (wc a) (B.readFile f)
 
 labelResults :: [FilePath] -> [Result] -> [String]
 labelResults (f:[]) (r:[]) = [show r ++ " " ++ f]
 labelResults fs rs = zipWith (\r f -> show r ++ " " ++ f) (rs ++ [tally rs]) (fs ++ ["total"])
-    where tally = foldr (<>) mempty
+  where tally = foldr (<>) mempty
 
 wc :: A.Args -> B.ByteString -> Result
-wc a xs = let ls = if A.lines a then Just $ linecount xs else Nothing
-              ws = if A.words a then Just $ wordcount xs else Nothing
-              cs = if A.chars a then Just $ charcount xs else Nothing
-              bs = if A.bytes a then Just $ bytecount xs else Nothing
-              ll = if A.longest a then Just $ longest xs else Nothing
-          in Result ls ws cs bs ll
+wc a xs = let ls = if A.lines a then Just (linecount xs) else Nothing
+              ws = if A.words a then Just (wordcount xs) else Nothing
+              cs = if A.chars a then Just (charcount xs) else Nothing
+              bs = if A.bytes a then Just (bytecount xs) else Nothing
+              ll = if A.longest a then Just (longest xs) else Nothing
+           in Result ls ws cs bs ll
 
 linecount :: B.ByteString -> Int64
 linecount = B.count '\n'
@@ -73,4 +73,4 @@ longest = maximum . map T.length . T.lines . E.decodeUtf8
 
 pad :: Int -> Char -> String -> String
 pad w c s = (replicate n c) ++ s
-    where n = w - length s
+  where n = w - length s
