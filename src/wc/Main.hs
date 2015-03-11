@@ -16,7 +16,7 @@ main = do
     args <- A.getArgs
     case A.files args of
          Nothing -> print . wc args =<< B.getContents
-         Just fs -> putStr . unlines . labelResults . appendTotal =<< wcFiles args fs
+         Just fs -> putStr . unlines . label fs . total . map (wc args) =<< readFiles fs
 
 data Result =
     Result
@@ -25,8 +25,6 @@ data Result =
     (Maybe Int64)
     (Maybe Int64)
     (Maybe Int64)
-
-type FileResult = (FilePath,Result)
 
 instance Monoid Result where
     mempty = Result (Just 0) (Just 0) (Just 0) (Just 0) (Just 0)
@@ -46,27 +44,26 @@ instance Show Result where
 filterShow :: Result -> [String]
 filterShow (Result ls ws cs bs ll) = map (show . fromJust) (filter isJust [ls,ws,cs,bs,ll])
 
-wcFiles :: A.Args -> [FilePath] -> IO ([FileResult])
-wcFiles args fs = mapM (wcFile args) fs
-  where wcFile a f = fmap ((,) f) $ (fmap (wc a) (B.readFile f))
+readFiles :: [FilePath] -> IO ([B.ByteString])
+readFiles = mapM (B.readFile)
 
-appendTotal :: [FileResult] -> [FileResult]
-appendTotal (r:[]) = [r]
-appendTotal rs = rs ++ [("total",total)]
-    where total = foldr (<>) mempty (map (snd) rs)
+total :: [Result] -> [Result]
+total [r] = [r]
+total rs = rs ++ [foldr (<>) mempty rs]
 
-labelResults :: [FileResult] -> [String]
-labelResults frs = map (showWithFile padding) frs
-  where padding = calcPadding frs
+label :: [FilePath] -> [Result] -> [String]
+label fs rs = map (showFileResult padding) frPairs
+  where padding = widest rs
+        frPairs = zip (fs ++ ["total"]) rs
 
-showWithFile :: Int -> FileResult -> String
-showWithFile p (f,r) = (concat . maybePad $ filterShow r) ++ " " ++ f
+showFileResult :: Int -> (FilePath,Result) -> String
+showFileResult p (f,r) = (concat . maybePad $ filterShow r) ++ " " ++ f
   where maybePad (s:[]) = [s]
         maybePad ss = intersperse " " $ map (pad p ' ') ss
 
-calcPadding :: [FileResult] -> Int
-calcPadding rs = foldr (foldfn) 0 rs
-    where foldfn fr a = maximum $ a:(map (length) (filterShow $ snd fr))
+widest :: [Result] -> Int
+widest rs = foldr (foldfn) 0 rs
+  where foldfn r a = maximum $ a:(map (length) (filterShow r))
 
 wc :: A.Args -> B.ByteString -> Result
 wc a xs = let ls = if A.lines a then Just (linecount xs) else Nothing
