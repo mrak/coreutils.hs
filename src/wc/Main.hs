@@ -9,13 +9,26 @@ import Data.Maybe (isJust, fromJust)
 import Control.Applicative
 import Data.Monoid
 import Data.List (intersperse)
+import Data.Char (chr)
+import System.IO (stdin,hGetContents)
 
 main :: IO ()
 main = do
     args <- A.getArgs
-    case A.files args of
-         Nothing -> print . wc args =<< B.getContents
-         Just fs -> putStr . unlines . label fs . total . map (wc args) =<< readFiles fs
+    case A.files0from args of
+         Just "-" -> hGetContents stdin >>= doFiles args . split nul
+         Nothing  -> case A.files args of
+                          Nothing -> doStdin args
+                          Just fs -> doFiles args fs
+         Just f   -> doFiles args =<< readFilenames f
+
+doStdin :: A.Args -> IO ()
+doStdin args = print . wc args =<< B.getContents
+doFiles :: A.Args -> [FilePath] -> IO ()
+doFiles args fs = putStr . unlines . label fs . total . map (wc args) =<< readFiles fs
+
+readFilenames :: FilePath -> IO [FilePath]
+readFilenames f = fmap (split nul) (readFile f)
 
 data Result =
     Result
@@ -37,14 +50,14 @@ instance Monoid Result where
 
 instance Show Result where
     show r = concat . maybePad $ filterShow r
-      where maybePad (s:[]) = [s]
+      where maybePad [s] = [s]
             maybePad ss = intersperse " " $ map (pad 7 ' ') ss
 
 filterShow :: Result -> [String]
 filterShow (Result ls ws cs bs ll) = map (show . fromJust) (filter isJust [ls,ws,cs,bs,ll])
 
-readFiles :: [FilePath] -> IO ([B.ByteString])
-readFiles = mapM (B.readFile)
+readFiles :: [FilePath] -> IO [B.ByteString]
+readFiles = mapM B.readFile
 
 total :: [Result] -> [Result]
 total [r] = [r]
@@ -57,12 +70,12 @@ label fs rs = map (showFileResult padding) frPairs
 
 showFileResult :: Int -> (FilePath,Result) -> String
 showFileResult p (f,r) = (concat . maybePad $ filterShow r) ++ " " ++ f
-  where maybePad (s:[]) = [s]
+  where maybePad [s] = [s]
         maybePad ss = intersperse " " $ map (pad p ' ') ss
 
 widest :: [Result] -> Int
-widest rs = foldr (foldfn) 0 rs
-  where foldfn r a = maximum $ a:(map (length) (filterShow r))
+widest = foldr foldfn 0
+  where foldfn r a = maximum $ a : map length (filterShow r)
 
 wc :: A.Args -> B.ByteString -> Result
 wc a xs = let ls = if A.lines a then Just (linecount xs) else Nothing
@@ -88,5 +101,14 @@ longest :: B.ByteString -> Int64
 longest = maximum . map T.length . T.lines . E.decodeUtf8
 
 pad :: Int -> Char -> String -> String
-pad w c s = (replicate n c) ++ s
+pad w c s = replicate n c ++ s
   where n = w - length s
+
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+                 "" -> []
+                 s' -> w : split c s''
+                   where (w, s'') = break (== c) s'
+
+nul :: Char
+nul = chr 0

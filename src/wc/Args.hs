@@ -9,6 +9,7 @@ data Args = Args
     , words :: Bool
     , longest :: Bool
     , files :: Maybe [String]
+    , files0from :: Maybe FilePath
     } deriving Show
 
 bytesFlag :: Parser Bool
@@ -49,6 +50,12 @@ longestFlag = switch
 fileArgs :: Parser (Maybe [String])
 fileArgs = optional $ some $ argument str (metavar "FILES...")
 
+files0fromArg :: Parser (Maybe FilePath)
+files0fromArg = optional $ strOption
+    ( long "files0-from"
+   <> help "read input from the files specified by NUL-terminated names in file F; If F is - then read names from standard input"
+    )
+
 options :: Parser Args
 options = Args
     <$> bytesFlag
@@ -57,6 +64,7 @@ options = Args
     <*> wordsFlag
     <*> longestFlag
     <*> fileArgs
+    <*> files0fromArg
 
 getArgs :: IO Args
 getArgs = do
