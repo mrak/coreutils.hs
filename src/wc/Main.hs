@@ -105,10 +105,11 @@ pad w c s = replicate n c ++ s
   where n = w - length s
 
 split :: Char -> String -> [String]
-split c s = case dropWhile (== c) s of
-                 "" -> []
-                 s' -> w : split c s''
-                   where (w, s'') = break (== c) s'
+split _ [] = []
+split c s = p : split c s'
+    where (p,s') = case break (== c) s of
+                        (x,[]) -> (x, [])
+                        (x,xs) -> (x, tail xs)
 
 nul :: Char
 nul = chr 0
