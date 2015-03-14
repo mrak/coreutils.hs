@@ -1,7 +1,8 @@
-Single file
-
   $ export PROGRAM="${TESTDIR}/../../dist/build/wc/wc"
   $ export FLAG=""
+
+Single file
+
   $ printf "line one
   > line two
   > line three" > "$CRAMTMP"/files.t.input
@@ -11,8 +12,6 @@ Single file
 
 Multiple files
 
-  $ export PROGRAM="${TESTDIR}/../../dist/build/wc/wc"
-  $ export FLAG=""
   $ printf "line one
   > line two
   > line three" > "$CRAMTMP"/files.t.input1
