@@ -1,4 +1,4 @@
-module Main where
+module Wc where
 
 import Data.Int
 import qualified Data.ByteString.Lazy.Char8 as B
@@ -104,7 +104,7 @@ pad :: Int -> Char -> String -> String
 pad w c s = replicate n c ++ s
   where n = w - length s
 
-split :: Char -> String -> [String]
+split :: Eq a => a -> [a] -> [[a]]
 split _ [] = []
 split c s = p : split c s'
     where (p,s') = case break (== c) s of

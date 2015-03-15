@@ -1,4 +1,4 @@
-module Main where
+module TR where
 import Args
 
 main :: IO ()
