@@ -1,6 +1,6 @@
 Remember, -l counts *newline* bytes, not logical lines.
 
-  $ export PROGRAM="${TESTDIR}/../../dist/build/wc/wc"
+  $ export PROGRAM="${TESTDIR}/../../../dist/build/wc/wc"
   $ export FLAG="-l"
   $ printf "" | $PROGRAM $FLAG
   0

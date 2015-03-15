@@ -6,4 +6,4 @@ install:
   - cabal install --only-dependencies
 script:
   - cabal configure && cabal build
-  - $HOME/.local/bin/cram tests
+  - $HOME/.local/bin/cram tests/functional

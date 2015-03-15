@@ -1,4 +1,4 @@
-  $ export PROGRAM="${TESTDIR}/../../dist/build/wc/wc"
+  $ export PROGRAM="${TESTDIR}/../../../dist/build/wc/wc"
   $ printf "" | $PROGRAM
         0       0       0
   $ printf "a b\nc\n" | $PROGRAM

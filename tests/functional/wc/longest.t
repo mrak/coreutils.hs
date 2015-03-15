@@ -1,4 +1,4 @@
-  $ export PROGRAM="${TESTDIR}/../../dist/build/wc/wc"
+  $ export PROGRAM="${TESTDIR}/../../../dist/build/wc/wc"
   $ export FLAG="-L"
   $ printf "1\n12\n" | $PROGRAM $FLAG
   2
