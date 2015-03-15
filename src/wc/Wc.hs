@@ -17,10 +17,10 @@ main = do
     args <- A.getArgs
     case A.files0from args of
          Just "-" -> hGetContents stdin >>= doFiles args . split nul
+         Just f   -> doFiles args =<< readFilenames f
          Nothing  -> case A.files args of
                           Nothing -> doStdin args
                           Just fs -> doFiles args fs
-         Just f   -> doFiles args =<< readFilenames f
 
 doStdin :: A.Args -> IO ()
 doStdin args = print . wc args =<< B.getContents
@@ -105,11 +105,12 @@ pad w c s = replicate n c ++ s
   where n = w - length s
 
 split :: Eq a => a -> [a] -> [[a]]
-split _ [] = []
-split c s = p : split c s'
-    where (p,s') = case break (== c) s of
-                        (x,[]) -> (x, [])
-                        (x,xs) -> (x, tail xs)
+split e s | s == []   = []
+          | s == [e]  = [[],[]]
+          | otherwise = p : split e s'
+            where (p,s') = case break (== e) s of
+                                (x,[]) -> (x, [])
+                                (x,xs) -> (x, tail xs)
 
 nul :: Char
 nul = chr 0
