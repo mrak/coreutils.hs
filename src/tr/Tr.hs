@@ -1,8 +1,6 @@
-module TR where
-import Args
+module Tr where
 
-main :: IO ()
-main = getArgs >>= tr
+import Args
 
 tr :: Args -> IO ()
 tr _ = return ()

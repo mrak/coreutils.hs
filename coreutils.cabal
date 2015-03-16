@@ -12,18 +12,20 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 executable tr
-  main-is:             Tr.hs
+  main-is:             Main.hs
   hs-source-dirs:      src/tr
-  other-modules:       Args
+  other-modules:       Tr,
+                       Args
   build-depends:       optparse-applicative,
                        base >=4.7 && <4.8
   default-language:    Haskell2010
   ghc-options:         -O2
                        -Wall
 executable wc
-  main-is:             Wc.hs
+  main-is:             Main.hs
   hs-source-dirs:      src/wc
-  other-modules:       Args
+  other-modules:       Wc,
+                       Args
   build-depends:       text,
                        bytestring,
                        optparse-applicative,
@@ -36,8 +38,8 @@ test-suite unit
   type:               exitcode-stdio-1.0
   main-is:            Main.hs
   hs-source-dirs:     tests/unit,
-                      src/wc
-  other-modules:      Wc
+                      src/wc,
+                      src/tr
   build-depends:      tasty,
                       tasty-quickcheck,
                       text,

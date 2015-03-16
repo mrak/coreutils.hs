@@ -10,17 +10,6 @@ import Control.Applicative
 import Data.Monoid
 import Data.List (intersperse)
 import Data.Char (chr)
-import System.IO (stdin,hGetContents)
-
-main :: IO ()
-main = do
-    args <- A.getArgs
-    case A.files0from args of
-         Just "-" -> hGetContents stdin >>= doFiles args . split nul
-         Just f   -> doFiles args =<< readFilenames f
-         Nothing  -> case A.files args of
-                          Nothing -> doStdin args
-                          Just fs -> doFiles args fs
 
 doStdin :: A.Args -> IO ()
 doStdin args = print . wc args =<< B.getContents
