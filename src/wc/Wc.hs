@@ -13,11 +13,13 @@ import Data.Char (chr)
 
 doStdin :: A.Args -> IO ()
 doStdin args = print . wc args =<< B.getContents
+
 doFiles :: A.Args -> [FilePath] -> IO ()
 doFiles args fs = putStr . unlines . label fs . total . map (wc args) =<< readFiles fs
 
-readFilenames :: FilePath -> IO [FilePath]
-readFilenames f = fmap (split nul) (readFile f)
+files0from :: FilePath -> IO [FilePath]
+files0from "-" = fmap (split (chr 0)) (getContents)
+files0from f   = fmap (split (chr 0)) (readFile f)
 
 data Result =
     Result
@@ -46,7 +48,9 @@ filterShow :: Result -> [String]
 filterShow (Result ls ws cs bs ll) = map (show . fromJust) (filter isJust [ls,ws,cs,bs,ll])
 
 readFiles :: [FilePath] -> IO [B.ByteString]
-readFiles = mapM B.readFile
+readFiles = mapM fn
+    where fn "-" = B.getContents
+          fn f   = B.readFile f
 
 total :: [Result] -> [Result]
 total [r] = [r]
@@ -95,11 +99,8 @@ pad w c s = replicate n c ++ s
 
 split :: Eq a => a -> [a] -> [[a]]
 split e s | s == []   = []
-          | s == [e]  = [[],[]]
-          | otherwise = p : split e s'
-            where (p,s') = case break (== e) s of
-                                (x,[]) -> (x, [])
-                                (x,xs) -> (x, tail xs)
-
-nul :: Char
-nul = chr 0
+  | s == [e]  = [[],[]]
+  | otherwise = p : split e s'
+    where (p,s') = case break (== e) s of
+                        (x,[]) -> (x, [])
+                        (x,xs) -> (x, tail xs)
