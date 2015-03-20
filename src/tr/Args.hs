@@ -1,5 +1,14 @@
-module Args (Args(..), getArgs) where
+module Args ( Args(..)
+            , TranslateSet
+            , SqueezeSet
+            , DeleteSet
+            , getArgs
+            , Operation(..)
+            ) where
 import Options.Applicative
+import Data.Array
+import Data.Word
+import Data.Char (ord)
 
 data CLIArgs = CLIArgs
     { complement :: Bool
@@ -11,11 +20,25 @@ data CLIArgs = CLIArgs
     } deriving Show
 
 data Args = Args
-    { mode :: Mode
-    , squeeze_set :: Maybe String
+    { squeezeSet :: Array Word8 Bool
+    , operation :: Operation
     }
 
-data Mode = Translate | Delete | None
+data Operation = Translate TranslateSet | Delete DeleteSet | Noop
+    deriving (Eq)
+type TranslateSet = Array Word8 Word8
+type BoolSet = Array Word8 Bool
+type DeleteSet = BoolSet
+type SqueezeSet = BoolSet
+
+defaultDeleteSet :: Array Word8 Bool
+defaultDeleteSet = array (0, 255) [(x, False) | x <- [0..255]]
+
+defaultSqueezeSet :: Array Word8 Bool
+defaultSqueezeSet = array (0, 255) [(x, False) | x <- [0..255]]
+
+defaultTranslateSet :: Array Word8 Word8
+defaultTranslateSet = array (0, 255) [(x, x) | x <- [0..255]]
 
 complementFlag :: Parser Bool
 complementFlag = switch
@@ -61,9 +84,44 @@ options = CLIArgs
     <*> set1Arg
     <*> set2Arg
 
-validateArgs :: CLIArgs -> IO Args
-validateArgs cas = return $ Args {mode=Translate, squeeze_set=Nothing}
+w8ify :: String -> [Word8]
+w8ify = map c2w8
+
+c2w8 :: Char -> Word8
+c2w8 = fromIntegral . ord
+
+createTranslationSet :: String -> String -> TranslateSet
+createTranslationSet s1 s2 = defaultTranslateSet // zip (w8ify s1) (w8ify s2)
+
+createBoolSet :: BoolSet -> String -> BoolSet
+createBoolSet a s = a // zip (w8ify s) (repeat True)
+
+createSqueezeSet :: Bool -> CLIArgs -> SqueezeSet
+createSqueezeSet b a = createBoolSet defaultSqueezeSet s
+    where s = if not b
+              then set1 a
+              else case set2 a of
+                        Nothing -> error "Two strings must be given when both deleting and squeezing repeats."
+                        Just s2 -> s2
+
+createDeleteSet :: String -> DeleteSet
+createDeleteSet = createBoolSet defaultDeleteSet
+
+processArgs :: CLIArgs -> IO Args
+processArgs cas = do
+    let op = if delete cas
+             then Delete . createDeleteSet $ set1 cas
+             else case set2 cas of
+                       Nothing -> Noop
+                       Just s  -> Translate . createTranslationSet (set1 cas) $ s
+    let sqzset = if   squeeze cas
+                 then createSqueezeSet (op /= Noop) cas
+                 else defaultSqueezeSet
+
+    if op == Noop && squeeze cas == False
+    then error "Two strings must be given while translating."
+    else return $ Args {operation = op, squeezeSet = sqzset}
 
 getArgs :: IO Args
-getArgs = execParser parser >>= validateArgs
+getArgs = execParser parser >>= processArgs
     where parser = info (helper <*> options) (fullDesc <> header "")
