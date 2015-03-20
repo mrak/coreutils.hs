@@ -11,11 +11,18 @@ import Data.Monoid
 import Data.List (intersperse)
 import Data.Char (chr)
 
+wc :: A.Args -> IO ()
+wc args = case A.files0from args of
+               Just f   -> files0from f >>= doFiles args
+               Nothing  -> case A.files args of
+                                Nothing -> doStdin args
+                                Just fs -> doFiles args fs
+
 doStdin :: A.Args -> IO ()
-doStdin args = print . wc args =<< B.getContents
+doStdin args = print . wc' args =<< B.getContents
 
 doFiles :: A.Args -> [FilePath] -> IO ()
-doFiles args fs = putStr . unlines . label fs . total . map (wc args) =<< readFiles fs
+doFiles args fs = putStr . unlines . label fs . total . map (wc' args) =<< readFiles fs
 
 files0from :: FilePath -> IO [FilePath]
 files0from "-" = fmap (split (chr 0)) (getContents)
@@ -70,12 +77,12 @@ widest :: [Result] -> Int
 widest = foldr foldfn 0
   where foldfn r a = maximum $ a : map length (filterShow r)
 
-wc :: A.Args -> B.ByteString -> Result
-wc a xs = let ls = if A.lines a then Just (linecount xs) else Nothing
-              ws = if A.words a then Just (wordcount xs) else Nothing
-              cs = if A.chars a then Just (charcount xs) else Nothing
-              bs = if A.bytes a then Just (bytecount xs) else Nothing
-              ll = if A.longest a then Just (longest xs) else Nothing
+wc' :: A.Args -> B.ByteString -> Result
+wc' a xs = let ls = if A.lines a then Just (linecount xs) else Nothing
+               ws = if A.words a then Just (wordcount xs) else Nothing
+               cs = if A.chars a then Just (charcount xs) else Nothing
+               bs = if A.bytes a then Just (bytecount xs) else Nothing
+               ll = if A.longest a then Just (longest xs) else Nothing
            in Result ls ws cs bs ll
 
 linecount :: B.ByteString -> Int64
