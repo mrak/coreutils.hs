@@ -74,8 +74,8 @@ showFileResult p (f,r) = (concat . maybePad $ filterShow r) ++ " " ++ f
         maybePad ss = intersperse " " $ map (pad p ' ') ss
 
 widest :: [Result] -> Int
-widest = foldr foldfn 0
-  where foldfn r a = maximum $ a : map length (filterShow r)
+widest [] = 0
+widest rs = maximum . map length . filterShow . last $ rs
 
 wc' :: A.Args -> B.ByteString -> Result
 wc' a xs = let ls = if A.lines a then Just (linecount xs) else Nothing
