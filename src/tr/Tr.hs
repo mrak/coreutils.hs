@@ -5,7 +5,7 @@ import Args
 import Data.Array
 import Data.Char (ord, chr)
 import Data.Word
-import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Data.ByteString.Char8 as B
 
 tr :: Args -> IO ()
 tr args = B.putStr . squeeze (squeezeSet args) . operationFn =<< B.getContents

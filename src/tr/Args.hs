@@ -98,7 +98,7 @@ createBoolSet a s = a // zip (w8ify s) (repeat True)
 
 createSqueezeSet :: Bool -> CLIArgs -> SqueezeSet
 createSqueezeSet b a = createBoolSet defaultSqueezeSet s
-    where s = if not b
+    where s = if b
               then set1 a
               else case set2 a of
                         Nothing -> error "Two strings must be given when both deleting and squeezing repeats."
@@ -115,7 +115,7 @@ processArgs cas = do
                        Nothing -> Noop
                        Just s  -> Translate . createTranslationSet (set1 cas) $ s
     let sqzset = if   squeeze cas
-                 then createSqueezeSet (op /= Noop) cas
+                 then createSqueezeSet (op == Noop) cas
                  else defaultSqueezeSet
 
     if op == Noop && squeeze cas == False
