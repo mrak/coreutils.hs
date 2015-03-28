@@ -47,31 +47,31 @@ instance Monoid Result where
         ((+) <$> ll1 <*> ll2)
 
 instance Show Result where
-    show r = concat . maybePad $ filterShow r
-      where maybePad [s] = [s]
-            maybePad ss = intersperse " " $ map (pad 7 ' ') ss
+    show r = concat . maybePad $ filterShow r where
+        maybePad [s] = [s]
+        maybePad ss = intersperse " " $ map (pad 7 ' ') ss
 
 filterShow :: Result -> [String]
 filterShow (Result ls ws cs bs ll) = map (show . fromJust) (filter isJust [ls,ws,cs,bs,ll])
 
 readFiles :: [FilePath] -> IO [B.ByteString]
-readFiles = mapM fn
-    where fn "-" = B.getContents
-          fn f   = B.readFile f
+readFiles = mapM fn where
+    fn "-" = B.getContents
+    fn f   = B.readFile f
 
 total :: [Result] -> [Result]
 total [r] = [r]
 total rs = rs ++ [foldr (<>) mempty rs]
 
 label :: [FilePath] -> [Result] -> [String]
-label fs rs = map (showFileResult padding) frPairs
-  where padding = widest rs
-        frPairs = zip (fs ++ ["total"]) rs
+label fs rs = map (showFileResult padding) frPairs where
+    padding = widest rs
+    frPairs = zip (fs ++ ["total"]) rs
 
 showFileResult :: Int -> (FilePath,Result) -> String
-showFileResult p (f,r) = (concat . maybePad $ filterShow r) ++ " " ++ f
-  where maybePad [s] = [s]
-        maybePad ss = intersperse " " $ map (pad p ' ') ss
+showFileResult p (f,r) = (concat . maybePad $ filterShow r) ++ " " ++ f where
+    maybePad [s] = [s]
+    maybePad ss = intersperse " " $ map (pad p ' ') ss
 
 widest :: [Result] -> Int
 widest [] = 0
@@ -83,7 +83,7 @@ wc' a xs = let ls = if A.lines a then Just (linecount xs) else Nothing
                cs = if A.chars a then Just (charcount xs) else Nothing
                bs = if A.bytes a then Just (bytecount xs) else Nothing
                ll = if A.longest a then Just (longest xs) else Nothing
-           in Result ls ws cs bs ll
+            in Result ls ws cs bs ll
 
 linecount :: B.ByteString -> Int64
 linecount = B.count '\n'
@@ -101,13 +101,13 @@ longest :: B.ByteString -> Int64
 longest = maximum . map T.length . T.lines . E.decodeUtf8
 
 pad :: Int -> Char -> String -> String
-pad w c s = replicate n c ++ s
-  where n = w - length s
+pad w c s = replicate n c ++ s where
+    n = w - length s
 
 split :: Eq a => a -> [a] -> [[a]]
 split e s | s == []   = []
   | s == [e]  = [[],[]]
-  | otherwise = p : split e s'
-    where (p,s') = case break (== e) s of
-                        (x,[]) -> (x, [])
-                        (x,xs) -> (x, tail xs)
+  | otherwise = p : split e s' where
+      (p,s') = case break (== e) s of
+                    (x,[]) -> (x, [])
+                    (x,xs) -> (x, tail xs)
