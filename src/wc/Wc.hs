@@ -10,6 +10,7 @@ import Control.Applicative
 import Data.Monoid
 import Data.List (intersperse)
 import Data.Char (chr)
+import Coreutils (split)
 
 wc :: A.Args -> IO ()
 wc args = case A.files0from args of
@@ -103,11 +104,3 @@ longest = maximum . map T.length . T.lines . E.decodeUtf8
 pad :: Int -> Char -> String -> String
 pad w c s = replicate n c ++ s where
     n = w - length s
-
-split :: Eq a => a -> [a] -> [[a]]
-split e s | s == []   = []
-  | s == [e]  = [[],[]]
-  | otherwise = p : split e s' where
-      (p,s') = case break (== e) s of
-                    (x,[]) -> (x, [])
-                    (x,xs) -> (x, tail xs)

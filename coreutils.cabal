@@ -1,51 +1,62 @@
-name:                coreutils
-version:             0.1.0.0
-synopsis:            GNU coreutils reimplemented in Haskell
-homepage:            https://github.com/mrak/coreutils
-license:             MIT
-license-file:        LICENSE
-author:              Eric Mrak
-maintainer:          mail@ericmrak.info
-copyright:           2015
-category:            System
-build-type:          Simple
-cabal-version:       >=1.10
+name:          coreutils
+version:       0.1.0.0
+synopsis:      GNU coreutils reimplemented in Haskell
+homepage:      https://github.com/mrak/coreutils
+license:       MIT
+license-file:  LICENSE
+author:        Eric Mrak
+maintainer:    mail@ericmrak.info
+copyright:     2015
+category:      System
+build-type:    Simple
+cabal-version: >=1.10
+
+library
+  hs-source-dirs:   src/lib
+  exposed-modules:  Coreutils
+  build-depends:    base >=4.7 && <4.8
+  default-language: Haskell2010
+  ghc-options:      -O2
+                    -Wall
 
 executable tr
-  main-is:             Main.hs
-  hs-source-dirs:      src/tr
-  other-modules:       Tr,
-                       Args
-  build-depends:       optparse-applicative,
-                       array,
-                       bytestring,
-                       base >=4.7 && <4.8
-  default-language:    Haskell2010
-  ghc-options:         -O2
-                       -Wall
+  main-is:          Main.hs
+  hs-source-dirs:   src/tr
+  other-modules:    Tr,
+                    Args
+  build-depends:    optparse-applicative,
+                    array,
+                    bytestring,
+                    base >=4.7 && <4.8
+  default-language: Haskell2010
+  ghc-options:      -O2
+                    -Wall
 executable wc
-  main-is:             Main.hs
-  hs-source-dirs:      src/wc
-  other-modules:       Wc,
-                       Args
-  build-depends:       text,
-                       bytestring,
-                       optparse-applicative,
-                       base >=4.7 && <4.8
-  default-language:    Haskell2010
-  ghc-options:         -O2
-                       -Wall
+  main-is:          Main.hs
+  hs-source-dirs:   src/wc
+  other-modules:    Wc,
+                    Args
+  build-depends:    coreutils,
+                    text,
+                    bytestring,
+                    optparse-applicative,
+                    base >=4.7 && <4.8
+  default-language: Haskell2010
+  ghc-options:      -O2
+                    -Wall
 
 test-suite unit
-  type:               exitcode-stdio-1.0
-  main-is:            Main.hs
-  hs-source-dirs:     tests/unit,
-                      src/wc,
-                      src/tr
-  build-depends:      tasty,
-                      tasty-quickcheck,
-                      text,
-                      bytestring,
-                      optparse-applicative,
-                      base >= 4.7 && <4.8
-  default-language:   Haskell2010
+  type:             exitcode-stdio-1.0
+  main-is:          Main.hs
+  hs-source-dirs:   tests/unit,
+                    src/lib,
+                    src/wc,
+                    src/tr
+  build-depends:    coreutils,
+                    tasty,
+                    tasty-quickcheck,
+                    text,
+                    bytestring,
+                    optparse-applicative,
+                    base >= 4.7 && <4.8
+  default-language: Haskell2010

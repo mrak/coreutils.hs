@@ -1,20 +1,22 @@
 import Test.Tasty
 import Test.Tasty.QuickCheck
-import Wc
+import Coreutils
 import Data.List (intersperse)
 
 main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "Unit tests" [wcTests]
+tests = testGroup "Unit tests" [libTests]
 
-wcTests = testGroup "wc" [splitTests]
+libTests :: TestTree
+libTests = testGroup "coreutils" [splitTests]
 
+splitTests :: TestTree
 splitTests = testGroup "split"
     [ testProperty "removes a" $
       \as -> length (as :: String) > 10 ==>
-             (',' `elem` (concat . split ',' . intersperse ',' $ as)) /= True
+             notElem ',' . concat . split ',' . intersperse ',' $ as
     , testProperty "has +1 results from element count" $
       \as -> length (as :: String) > 10 ==>
              let commafied = intersperse ',' as

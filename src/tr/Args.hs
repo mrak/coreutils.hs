@@ -7,10 +7,11 @@ module Args (
     , Operation(..)
     ) where
 
+import Prelude hiding (truncate)
 import Options.Applicative
 import Data.Array
 import Data.Word
-import Data.Char (ord)
+import Data.Char (ord, chr)
 
 data CLIArgs = CLIArgs { complement :: Bool
                        , delete :: Bool
@@ -90,6 +91,15 @@ w8ify = map c2w8
 c2w8 :: Char -> Word8
 c2w8 = fromIntegral . ord
 
+complementify :: CLIArgs -> CLIArgs
+complementify c = c {set1 = [(chr x) | x <- [0..255], not (elem (chr x) s)]} where
+    s = set1 c
+
+truncatify :: CLIArgs -> CLIArgs
+truncatify c = case set2 c of
+                    Nothing -> c
+                    Just s2 -> c {set1 = take (length s2) (set1 c)}
+
 createTranslationSet :: String -> String -> TranslateSet
 createTranslationSet s1 s2 = defaultTranslateSet // zip (w8ify s1) (w8ify s2)
 
@@ -107,17 +117,18 @@ createDeleteSet :: String -> DeleteSet
 createDeleteSet = createBoolSet defaultDeleteSet
 
 processArgs :: CLIArgs -> IO Args
-processArgs cas = do
-    let op = if delete cas
-        then Delete . createDeleteSet $ set1 cas
-        else case set2 cas of
+processArgs c' = do
+    let c = truncatify . complementify $ c'
+    let op = if delete c
+        then Delete . createDeleteSet $ set1 c
+        else case set2 c of
                   Nothing -> Noop
-                  Just s  -> Translate . createTranslationSet (set1 cas) $ s
-    let sqzset = if squeeze cas
-        then createSqueezeSet (op == Noop) cas
+                  Just s  -> Translate . createTranslationSet (set1 c) $ s
+    let sqzset = if squeeze c
+        then createSqueezeSet (op == Noop) c
         else defaultSqueezeSet
 
-    if op == Noop && squeeze cas == False
+    if op == Noop && squeeze c == False
        then error "Two strings must be given while translating."
        else return $ Args {operation = op, squeezeSet = sqzset}
 
