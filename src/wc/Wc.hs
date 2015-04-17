@@ -6,7 +6,6 @@ import qualified Args as A
 import qualified Data.Text.Lazy.Encoding as E
 import qualified Data.Text.Lazy as T
 import Data.Maybe (isJust, fromJust)
-import Control.Applicative
 import Data.Monoid
 import Data.List (intersperse)
 import Data.Char (chr)

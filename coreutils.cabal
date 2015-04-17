@@ -14,7 +14,7 @@ cabal-version: >=1.10
 library
   hs-source-dirs:   src/lib
   exposed-modules:  Coreutils
-  build-depends:    base >=4.7 && <4.8
+  build-depends:    base >=4.8 && <4.9
   default-language: Haskell2010
   ghc-options:      -O2
                     -Wall
@@ -27,7 +27,7 @@ executable tr
   build-depends:    optparse-applicative,
                     array,
                     bytestring,
-                    base >=4.7 && <4.8
+                    base >=4.8 && <4.9
   default-language: Haskell2010
   ghc-options:      -O2
                     -Wall
@@ -40,7 +40,7 @@ executable wc
                     text,
                     bytestring,
                     optparse-applicative,
-                    base >=4.7 && <4.8
+                    base >=4.8 && <4.9
   default-language: Haskell2010
   ghc-options:      -O2
                     -Wall
@@ -58,5 +58,5 @@ test-suite unit
                     text,
                     bytestring,
                     optparse-applicative,
-                    base >= 4.7 && <4.8
+                    base >= 4.8 && <4.9
   default-language: Haskell2010
