@@ -92,13 +92,22 @@ c2w8 :: Char -> Word8
 c2w8 = fromIntegral . ord
 
 complementify :: CLIArgs -> CLIArgs
-complementify c = c {set1 = [(chr x) | x <- [0..255], not (elem (chr x) s)]} where
+complementify c = if complement c then complementify' c else c where
+    complementify' c' = c' {set1 = [(chr x) | x <- [0..255], not (elem (chr x) s)]}
     s = set1 c
 
 truncatify :: CLIArgs -> CLIArgs
 truncatify c = case set2 c of
                     Nothing -> c
-                    Just s2 -> c {set1 = take (length s2) (set1 c)}
+                    Just s2 -> truncatify' where
+                        truncatify' = if truncate c then c {set1 = take (length s2) (set1 c)}
+                                                    else c
+
+expandify :: CLIArgs -> CLIArgs
+expandify c = case set2 c of
+                   Nothing -> c
+                   Just s2 -> c {set2 = Just $ take (length s1) (s2 ++ repeat (last s2))} where
+                       s1 = set1 c
 
 createTranslationSet :: String -> String -> TranslateSet
 createTranslationSet s1 s2 = defaultTranslateSet // zip (w8ify s1) (w8ify s2)
@@ -118,7 +127,7 @@ createDeleteSet = createBoolSet defaultDeleteSet
 
 processArgs :: CLIArgs -> IO Args
 processArgs c' = do
-    let c = truncatify . complementify $ c'
+    let c = expandify . truncatify . complementify $ c'
     let op = if delete c
         then Delete . createDeleteSet $ set1 c
         else case set2 c of
