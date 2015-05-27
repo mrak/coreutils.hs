@@ -1,4 +1,5 @@
 name:          coreutils
+description:   Learn Haskell by reimplementing the GNU Coreutils
 version:       0.1.0.0
 synopsis:      GNU coreutils reimplemented in Haskell
 homepage:      https://github.com/mrak/coreutils
@@ -11,13 +12,16 @@ category:      System
 build-type:    Simple
 cabal-version: >=1.10
 
+source-repository head
+  type:     git
+  location: https://github.com/mrak/coreutils.hs
+
 library
   hs-source-dirs:   src/lib
   exposed-modules:  Coreutils
   build-depends:    base >=4.8 && <4.9
   default-language: Haskell2010
-  ghc-options:      -O2
-                    -Wall
+  ghc-options:      -Wall
 
 executable tr
   main-is:          Main.hs
@@ -29,8 +33,8 @@ executable tr
                     bytestring,
                     base >=4.8 && <4.9
   default-language: Haskell2010
-  ghc-options:      -O2
-                    -Wall
+  ghc-options:      -Wall
+
 executable wc
   main-is:          Main.hs
   hs-source-dirs:   src/wc
@@ -42,8 +46,7 @@ executable wc
                     optparse-applicative,
                     base >=4.8 && <4.9
   default-language: Haskell2010
-  ghc-options:      -O2
-                    -Wall
+  ghc-options:      -Wall
 
 test-suite unit
   type:             exitcode-stdio-1.0
