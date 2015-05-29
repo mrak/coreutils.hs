@@ -1,5 +1,6 @@
 module Args (
     Args(..)
+    , NumberLines(..)
     , getArgs
     ) where
 

@@ -24,6 +24,11 @@ doStdin args = print . wc' args =<< B.getContents
 doFiles :: A.Args -> [FilePath] -> IO ()
 doFiles args fs = putStr . unlines . label fs . total . map (wc' args) =<< readFiles fs
 
+readFiles :: [FilePath] -> IO [B.ByteString]
+readFiles = mapM fn where
+    fn "-" = B.getContents
+    fn f   = B.readFile f
+
 files0from :: FilePath -> IO [FilePath]
 files0from "-" = fmap (split (chr 0)) (getContents)
 files0from f   = fmap (split (chr 0)) (readFile f)
@@ -53,11 +58,6 @@ instance Show Result where
 
 filterShow :: Result -> [String]
 filterShow (Result ls ws cs bs ll) = map (show . fromJust) (filter isJust [ls,ws,cs,bs,ll])
-
-readFiles :: [FilePath] -> IO [B.ByteString]
-readFiles = mapM fn where
-    fn "-" = B.getContents
-    fn f   = B.readFile f
 
 total :: [Result] -> [Result]
 total [r] = [r]

@@ -29,6 +29,7 @@ executable cat
   other-modules:    Cat,
                     Args
   build-depends:    optparse-applicative,
+                    bytestring,
                     base >=4.8 && <4.9
   default-language: Haskell2010
   ghc-options:      -Wall
@@ -64,7 +65,8 @@ test-suite unit
   hs-source-dirs:   tests/unit,
                     src/lib,
                     src/wc,
-                    src/tr
+                    src/tr,
+                    src/cat
   build-depends:    coreutils,
                     tasty,
                     tasty-quickcheck,
