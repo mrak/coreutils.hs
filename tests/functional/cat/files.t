@@ -16,3 +16,13 @@
   line one (again)
   line two (again)
   line three (again, and again, and again)
+
+With STDIN, too
+  $ echo "one more thing..." | $PROGRAM $FILE1 $FILE2 -
+  line one
+  line two
+  line three
+  line one (again)
+  line two (again)
+  line three (again, and again, and again)
+  one more thing...
