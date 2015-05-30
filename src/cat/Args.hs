@@ -124,8 +124,13 @@ processLines c = nonblankLines . allLines where
                             then a { numberLines = NonemptyLines }
                             else a
 
+processFiles :: CLIArgs -> Args -> Args
+processFiles c a = case _files c of
+                        Nothing -> a
+                        Just fs -> a { files = fs }
+
 processArgs :: CLIArgs -> IO Args
-processArgs c = return . processLines c . processShown c $ defaultArgs
+processArgs c = return . processFiles c . processLines c . processShown c $ defaultArgs
 
 options :: Parser CLIArgs
 options =
