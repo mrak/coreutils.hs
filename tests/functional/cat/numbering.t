@@ -6,18 +6,18 @@ All lines
        1  one
        2   (re)
        3  two
-       4  three
+       4  three (no-eol)
 
 Non-blank lines
   $ printf "one\n\ntwo\nthree" | $PROGRAM -b
        1  one
    (re)
        2  two
-       3  three
+       3  three (no-eol)
 
 Applies numbering first
   $ printf "one\n\ntwo\nthree" | $PROGRAM -b -E
        1  one$
   $
        2  two$
-       3  three$
+       3  three$ (no-eol)

@@ -129,8 +129,8 @@ processFiles c a = case _files c of
                         Nothing -> a
                         Just fs -> a { files = fs }
 
-processArgs :: CLIArgs -> IO Args
-processArgs c = return . processFiles c . processLines c . processShown c $ defaultArgs
+processArgs :: CLIArgs -> Args
+processArgs c = processFiles c . processLines c . processShown c $ defaultArgs { squeezeBlank = _squeezeBlank c }
 
 options :: Parser CLIArgs
 options =
@@ -147,5 +147,5 @@ options =
     <*> fileArgs
 
 getArgs :: IO Args
-getArgs = execParser parser >>= processArgs where
+getArgs = execParser parser >>= return . processArgs where
     parser = info (helper <*> options) (fullDesc <> header "")
