@@ -1,4 +1,4 @@
-  $ export PROGRAM="${TESTDIR}/../../../dist/build/cat/cat"
+  $ export PROGRAM="${TESTDIR}/../../../$(stack path --dist-dir | cut -d' ' -f2)build/cat/cat"
   $ export FLAG="-s"
 
   $ printf "first\n\n\n\n\nlast" | $PROGRAM $FLAG

@@ -19,14 +19,16 @@ source-repository head
 library
   hs-source-dirs:   src/lib
   exposed-modules:  Coreutils
-  build-depends:    base >=4.8 && <4.9
+  build-depends:    containers,
+                    bytestring,
+                    base >=4.8 && <4.9
   default-language: Haskell2010
   ghc-options:      -Wall
 
 executable cat
   main-is:          Main.hs
   hs-source-dirs:   src/cat
-  other-modules:    Cat,
+  other-modules:    Cat
                     Args
   build-depends:    optparse-applicative,
                     bytestring,
@@ -39,9 +41,10 @@ executable tr
   hs-source-dirs:   src/tr
   other-modules:    Tr,
                     Args
-  build-depends:    optparse-applicative,
+  build-depends:    coreutils,
                     array,
                     bytestring,
+                    optparse-applicative,
                     base >=4.8 && <4.9
   default-language: Haskell2010
   ghc-options:      -Wall
@@ -72,6 +75,7 @@ test-suite unit
                     tasty-quickcheck,
                     text,
                     bytestring,
+                    containers,
                     optparse-applicative,
                     base >= 4.8 && <4.9
   default-language: Haskell2010

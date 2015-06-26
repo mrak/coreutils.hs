@@ -1,4 +1,4 @@
-  $ export PROGRAM="${TESTDIR}/../../../dist/build/cat/cat"
+  $ export PROGRAM="${TESTDIR}/../../../$(stack path --dist-dir | cut -d' ' -f2)build/cat/cat"
   $ export FILE1="$CRAMTMP"/files.t.input1
   $ export FILE2="$CRAMTMP"/files.t.input2
 

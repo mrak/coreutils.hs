@@ -1,4 +1,4 @@
-  $ export PROGRAM="${TESTDIR}/../../../dist/build/wc/wc"
+  $ export PROGRAM="${TESTDIR}/../../../$(stack path --dist-dir | cut -d' ' -f2)build/wc/wc"
   $ export FLAG="--files0-from=-"
   $ export FILE="${CRAMTMP}/files0-from.t.input"
 
