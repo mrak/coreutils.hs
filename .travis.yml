@@ -8,7 +8,7 @@ before_install:
  - sudo apt-get install stack -y
 
 install:
- - stack setup
+ - stack setup 7.10.1 --no-system-ghc
  - pip install --user cram
 
 # Here starts the actual work to be performed for the package under test; any command which exits with a non-zero exit code causes the build to fail.
