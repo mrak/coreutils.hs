@@ -1,4 +1,5 @@
 langage: haskell
+sudo: false
 
 before_install:
  # Instructions taken from https://github.com/commercialhaskell/stack/wiki/Downloads
