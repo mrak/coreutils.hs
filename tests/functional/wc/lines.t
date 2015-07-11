@@ -1,6 +1,7 @@
 Remember, -l counts *newline* bytes, not logical lines.
 
-  $ export PROGRAM="${TESTDIR}/../../../$(stack path --dist-dir | cut -d' ' -f2)build/wc/wc"
+  $ export EXECUTABLE="wc"
+  $ export PROGRAM="${TESTDIR}/../../../$(cd $TESTDIR; stack path --dist-dir | cut -d' ' -f2)/build/${EXECUTABLE}/${EXECUTABLE}"
   $ export FLAG="-l"
   $ printf "" | $PROGRAM $FLAG
   0

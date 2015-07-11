@@ -1,4 +1,5 @@
-  $ export PROGRAM="${TESTDIR}/../../../$(stack path --dist-dir | cut -d' ' -f2)build/cat/cat"
+  $ export EXECUTABLE="cat"
+  $ export PROGRAM="${TESTDIR}/../../../$(cd $TESTDIR; stack path --dist-dir | cut -d' ' -f2)/build/${EXECUTABLE}/${EXECUTABLE}"
   $ export FILE1="$CRAMTMP"/files.t.input1
   $ export FILE2="$CRAMTMP"/files.t.input2
 

@@ -1,4 +1,5 @@
-  $ export PROGRAM="${TESTDIR}/../../../$(stack path --dist-dir | cut -d' ' -f2)build/tr/tr"
+  $ export EXECUTABLE="tr"
+  $ export PROGRAM="${TESTDIR}/../../../$(cd $TESTDIR; stack path --dist-dir | cut -d' ' -f2)/build/${EXECUTABLE}/${EXECUTABLE}"
   $ export FLAG=""
 
 Just a backslack
