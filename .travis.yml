@@ -13,7 +13,7 @@ before_install:
 
 install:
   - stack setup --no-terminal
-  - stack build --only-snapshot --no-terminal
+  - stack build --no-terminal
   - pip install --user cram
 
 script:
