@@ -1,18 +1,20 @@
-langage: haskell
+language: haskell
+
 sudo: false
+cache:
+  directories:
+    - $HOME/.stack/
 
 before_install:
- # Instructions taken from https://github.com/commercialhaskell/stack/wiki/Downloads
- - wget -q -O- http://download.fpcomplete.com/ubuntu/fpco.key | sudo apt-key add -
- - echo 'deb http://download.fpcomplete.com/ubuntu/precise stable main' | sudo tee /etc/apt/sources.list.d/fpco.list
- - sudo apt-get update
- - sudo apt-get install stack -y
+  - mkdir -p ~/.local/bin
+  - export PATH=~/.local/bin:$PATH
+  - travis_retry curl -L https://github.com/commercialhaskell/stack/releases/download/v0.1.1.0/stack-0.1.1.0-x86_64-linux.gz | gunzip > ~/.local/bin/stack
+  - chmod a+x ~/.local/bin/stack
 
 install:
- - stack setup 7.10.1 --no-system-ghc
- - pip install --user cram
+  - stack setup --no-terminal
+  - stack build --only-snapshot --no-terminal
 
-# Here starts the actual work to be performed for the package under test; any command which exits with a non-zero exit code causes the build to fail.
 script:
- - stack test
- - $HOME/.local/bin/cram tests/functional
+  - stack test
+  - $HOME/.local/bin/cram tests/functional
