@@ -1,6 +1,6 @@
 language: haskell
-
 sudo: false
+
 cache:
   directories:
     - $HOME/.stack/
@@ -14,7 +14,8 @@ before_install:
 install:
   - stack setup --no-terminal
   - stack build --only-snapshot --no-terminal
+  - pip install --user cram
 
 script:
-  - stack test
+  - stack test --no-terminal
   - $HOME/.local/bin/cram tests/functional
