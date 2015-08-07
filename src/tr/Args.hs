@@ -12,7 +12,7 @@ import Options.Applicative
 import Data.Array
 import Data.Word
 import Data.Char (ord, chr)
-import Coreutils (unescape)
+import Coreutils (unescape, unrange)
 
 data CLIArgs = CLIArgs { complement :: Bool
                        , delete :: Bool
@@ -126,12 +126,15 @@ createSqueezeSet b a = createBoolSet defaultSqueezeSet s
 createDeleteSet :: String -> DeleteSet
 createDeleteSet = createBoolSet defaultDeleteSet
 
+unrangeify :: CLIArgs -> CLIArgs
+unrangeify c = c { set1 = unrange (set1 c), set2 = unrange <$> set2 c }
+
 unescapeify :: CLIArgs -> CLIArgs
 unescapeify c = c { set1 = unescape (set1 c), set2 = unescape <$> set2 c }
 
 processArgs :: CLIArgs -> IO Args
 processArgs c' = do
-    let c = expandify . truncatify . complementify . unescapeify $ c'
+    let c = expandify . truncatify . complementify . unrangeify . unescapeify $ c'
     let op = if delete c
         then Delete . createDeleteSet $ set1 c
         else case set2 c of
