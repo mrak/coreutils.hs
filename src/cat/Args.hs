@@ -5,6 +5,7 @@ module Args (
     ) where
 
 import Options.Applicative
+import Control.Monad (liftM)
 
 data CLIArgs = CLIArgs { _showAll :: Bool
                        , _numberNonblank :: Bool
@@ -147,5 +148,5 @@ options =
     <*> fileArgs
 
 getArgs :: IO Args
-getArgs = execParser parser >>= return . processArgs where
+getArgs = liftM processArgs (execParser parser) where
     parser = info (helper <*> options) (fullDesc <> header "")

@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ViewPatterns #-}
 module Cat where
 
 import Prelude as P hiding (putStrLn, getContents, readFile)
@@ -31,7 +30,7 @@ getFileContents f = B.readFile f
 singleSpace :: B.ByteString -> B.ByteString
 singleSpace = unlines' . singleSpace' . B.lines where
     singleSpace' [] = []
-    singleSpace' b@(_:[]) = b
+    singleSpace' b@[_] = b
     singleSpace' (a:b:bs) | B.length a == 0 && B.length b == 0 = singleSpace' (b:bs)
                           | otherwise = a : singleSpace' (b:bs)
 
@@ -44,13 +43,13 @@ numberNonblank = unlines' . number 1 . B.lines where
     number :: Int -> [B.ByteString] -> [B.ByteString]
     number _ [] = []
     number n (b:bs) | B.length b == 0 = b : number n bs
-                    | otherwise = (pad 6 ' ' n) <> "  " <> b : number (n + 1) bs
+                    | otherwise = pad 6 ' ' n <> "  " <> b : number (n + 1) bs
 
 numberAll :: B.ByteString -> B.ByteString
 numberAll = unlines' . number 1 . B.lines where
     number :: Int -> [B.ByteString] -> [B.ByteString]
     number _ [] = []
-    number n (b:bs) = (pad 6 ' ' n) <> "  " <> b : number (n + 1) bs
+    number n (b:bs) = pad 6 ' ' n <> "  " <> b : number (n + 1) bs
 
 pad :: Show a => Int64 -> Char -> a -> B.ByteString
 pad w c a = B.replicate n c <> s where

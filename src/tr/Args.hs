@@ -10,6 +10,7 @@ module Args (
 import Prelude hiding (truncate)
 import Options.Applicative
 import Data.Array
+import Data.Maybe (fromMaybe)
 import Data.Word
 import Data.Char (ord, chr)
 import Coreutils (unescape, unrange)
@@ -94,7 +95,7 @@ c2w8 = fromIntegral . ord
 
 complementify :: CLIArgs -> CLIArgs
 complementify c = if complement c then complementify' c else c where
-    complementify' c' = c' {set1 = [(chr x) | x <- [0..255], not (elem (chr x) s)]}
+    complementify' c' = c' {set1 = [chr x | x <- [0..255],  chr x `notElem` s]}
     s = set1 c
 
 truncatify :: CLIArgs -> CLIArgs
@@ -119,9 +120,7 @@ createBoolSet a s = a // zip (w8ify s) (repeat True)
 createSqueezeSet :: Bool -> CLIArgs -> SqueezeSet
 createSqueezeSet b a = createBoolSet defaultSqueezeSet s
   where s = if b then set1 a
-                 else case set2 a of
-                           Nothing -> error "Two strings must be given when both deleting and squeezing repeats."
-                           Just s2 -> s2
+                 else fromMaybe (error "Two strings must be given when both deleting and squeezing repeats.") (set2 a)
 
 createDeleteSet :: String -> DeleteSet
 createDeleteSet = createBoolSet defaultDeleteSet
@@ -144,9 +143,9 @@ processArgs c' = do
         then createSqueezeSet (op == Noop) c
         else defaultSqueezeSet
 
-    if op == Noop && squeeze c == False
+    if op == Noop && not (squeeze c)
        then error "Two strings must be given while translating."
-       else return $ Args {operation = op, squeezeSet = sqzset}
+       else return Args {operation = op, squeezeSet = sqzset}
 
 getArgs :: IO Args
 getArgs = execParser parser >>= processArgs where

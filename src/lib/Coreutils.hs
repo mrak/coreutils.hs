@@ -22,24 +22,27 @@ split e s
 escapeSequences :: M.Map String Char
 escapeSequences = M.fromList [("\\\\", '\\'),("\\a", chr 7),("\\b", chr 8),("\\f", chr 12),("\\n", chr 10),("\\r", chr 13),("\\t", chr 9),("\\v", chr 11)]
 
+derepeat :: String -> String
+derepeat = undefined
+
 unrange :: String -> String
 unrange [] = []
-unrange s@(_:[]) = s
-unrange s@(_:_:[]) = s
+unrange s@[_] = s
+unrange s@[_,_] = s
 unrange (x:'\\':'-':cs) = x : '-' : unrange cs
 unrange (x:'-':y:cs)
-    | (ord x) >= (ord y) = x : '-' : y : unrange cs
+    | ord x >= ord y = x : '-' : y : unrange cs
     | otherwise = [chr c | c <- [(ord x)..(ord y)]] ++ unrange cs
 
 unrange (h:t) = h : unrange t
 
 unescape :: String -> String
 unescape [] = []
-unescape s@(_:[]) = s
+unescape s@[_] = s
 unescape ('\\':'-':zs) = '\\' : '-' : unescape zs
 unescape ('\\':y:zs)
     | isOctDigit y = let os = (take 2 . takeWhile isOctDigit) zs
-                         zs' = (drop (length os) zs)
+                         zs' = drop (length os) zs
                       in octToChar (y : os) : unescape zs'
     | otherwise = case M.lookup ['\\',y] escapeSequences of
                        Nothing -> unescape (y : zs)

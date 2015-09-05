@@ -30,7 +30,7 @@ readFiles = mapM fn where
     fn f   = B.readFile f
 
 files0from :: FilePath -> IO [FilePath]
-files0from "-" = fmap (split (chr 0)) (getContents)
+files0from "-" = fmap (split (chr 0)) getContents
 files0from f   = fmap (split (chr 0)) (readFile f)
 
 data Result =
