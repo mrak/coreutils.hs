@@ -23,7 +23,7 @@ data CLIArgs = CLIArgs { complement :: Bool
                        , set2 :: Maybe String
                        } deriving Show
 
-data Args = Args { squeezeSet :: Array Word8 Bool
+data Args = Args { squeezeSet :: SqueezeSet
                  , operation :: Operation
                  }
 
@@ -32,18 +32,19 @@ data Operation = Translate TranslateSet
                | Noop
                deriving (Eq)
 
-type TranslateSet = Array Word8 Word8
+type WordSet = Array Word8 Word8
 type BoolSet = Array Word8 Bool
+type TranslateSet = WordSet
 type DeleteSet = BoolSet
 type SqueezeSet = BoolSet
 
-defaultDeleteSet :: Array Word8 Bool
+defaultDeleteSet :: BoolSet
 defaultDeleteSet = array (0, 255) [(x, False) | x <- [0..255]]
 
-defaultSqueezeSet :: Array Word8 Bool
+defaultSqueezeSet :: BoolSet
 defaultSqueezeSet = array (0, 255) [(x, False) | x <- [0..255]]
 
-defaultTranslateSet :: Array Word8 Word8
+defaultTranslateSet :: WordSet
 defaultTranslateSet = array (0, 255) [(x, x) | x <- [0..255]]
 
 complementFlag :: Parser Bool
