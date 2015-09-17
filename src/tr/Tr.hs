@@ -1,38 +1,44 @@
-{-# LANGUAGE ViewPatterns #-}
 module Tr where
 
 import Args
 import Data.Array
 import Data.Char (ord, chr)
 import Data.Word
+import Pipes
+import qualified Pipes.Prelude as P
 import qualified Data.ByteString.Char8 as B
 
 tr :: Args -> IO ()
-tr args = B.putStr . squeeze (squeezeSet args) . operationFn =<< B.getContents where
+tr args = runEffect $ getChars >-> operationFn >-> squeeze (squeezeSet args) >-> putChars where
     operationFn = case operation args of
                        Translate s -> translate s
                        Delete s -> delete s
-                       Noop -> id
+                       Noop -> P.map id
 
-squeeze :: SqueezeSet -> B.ByteString -> B.ByteString
-squeeze _ (B.uncons -> Nothing) = B.empty
-squeeze _ (B.uncons -> Just (x, B.uncons -> Nothing)) = B.singleton x
-squeeze a (B.uncons -> Just (x, B.uncons -> Just (y, zs)))
-  | x /= y = x `B.cons` squeeze a (y `B.cons` zs)
-  | otherwise = if a ! toIx x
-                   then squeeze a $ y `B.cons` zs
-                   else x `B.cons` squeeze a (y`B.cons` zs)
+getChars :: Producer Char IO ()
+getChars = lift B.getContents >>= getChars' where
+    getChars' c = case B.uncons c of
+                       Nothing -> return ()
+                       Just(w,bs) -> yield w >> getChars' bs
 
-delete :: DeleteSet -> B.ByteString -> B.ByteString
-delete _ (B.uncons -> Nothing) = B.empty
-delete s (B.uncons -> Just (w, ws)) = if s ! toIx w
-                                         then delete s ws
-                                         else w `B.cons` delete s ws
+putChars :: Consumer Char IO ()
+putChars = P.mapM_ putChar
 
-translate :: TranslateSet -> B.ByteString -> B.ByteString
-translate _ (B.uncons -> Nothing) = B.empty
-translate s (B.uncons -> Just (w, ws)) = w' `B.cons` translate s ws where
-    w' = chr . fromIntegral $ s ! toIx w
+squeeze :: Monad m => SqueezeSet -> Pipe Char Char m r
+squeeze ss = do
+    a <- await
+    b <- await
+    squeeze' a b where
+    squeeze' x y | x /= y = yield x >> await >>= squeeze' y
+                  | otherwise = if ss ! toIx x
+                                   then await >>= squeeze' x
+                                   else yield x >> await >>= squeeze' y
+
+delete :: DeleteSet -> Pipe Char Char IO ()
+delete s = P.filter (\w -> not (s ! toIx w))
+
+translate :: TranslateSet -> Pipe Char Char IO ()
+translate s = P.map (\w -> chr . fromIntegral $ s ! toIx w)
 
 toIx :: Char -> Word8
 toIx = fromIntegral . ord
