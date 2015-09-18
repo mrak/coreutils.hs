@@ -73,6 +73,10 @@ showFileResult p (f,r) = (concat . maybePad $ filterShow r) ++ " " ++ f where
     maybePad [s] = [s]
     maybePad ss = intersperse " " $ map (pad p ' ') ss
 
+pad :: Int -> Char -> String -> String
+pad w c s = replicate n c ++ s where
+    n = w - length s
+
 widest :: [Result] -> Int
 widest [] = 0
 widest rs = maximum . map length . filterShow . last $ rs
@@ -99,7 +103,3 @@ bytecount = B.length
 
 longest :: B.ByteString -> Int64
 longest = maximum . map T.length . T.lines . E.decodeUtf8
-
-pad :: Int -> Char -> String -> String
-pad w c s = replicate n c ++ s where
-    n = w - length s

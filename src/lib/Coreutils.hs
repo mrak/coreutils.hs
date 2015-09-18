@@ -50,7 +50,6 @@ unescape s = head s : unescape (tail s)
 octToChar :: String -> Char
 octToChar = chr . fst . head . readOct
 
-
 unescapeBS :: B.ByteString -> B.ByteString
 unescapeBS (B.uncons -> Nothing) = B.empty
 unescapeBS (B.uncons -> Just (x, B.uncons -> Nothing)) = B.singleton x
