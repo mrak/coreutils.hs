@@ -21,6 +21,21 @@ library
   exposed-modules:  Coreutils
   build-depends:    containers,
                     bytestring,
+                    optparse-applicative,
+                    base >=4.8 && <4.9
+  default-language: Haskell2010
+  ghc-options:      -Wall
+
+executable base64
+  main-is:          Main.hs
+  hs-source-dirs:   src/base64
+  other-modules:    Base64
+                    Args
+  build-depends:    optparse-applicative,
+                    base64-bytestring,
+                    bytestring,
+                    coreutils,
+                    pipes,
                     base >=4.8 && <4.9
   default-language: Haskell2010
   ghc-options:      -Wall
@@ -54,6 +69,16 @@ executable true
   main-is:          Main.hs
   hs-source-dirs:   src/true
   build-depends:    base >=4.8 && <4.9
+  default-language: Haskell2010
+  ghc-options:      -Wall
+
+executable uniq
+  main-is:          Main.hs
+  hs-source-dirs:   src/uniq
+  other-modules:    Uniq,
+                    Args
+  build-depends:    optparse-applicative,
+                    base >=4.8 && <4.9
   default-language: Haskell2010
   ghc-options:      -Wall
 

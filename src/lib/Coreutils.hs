@@ -3,12 +3,15 @@ module Coreutils ( unescape
                  , unescapeBS
                  , unrange
                  , split
+                 , versionOption
                  ) where
 
 import Data.Char (chr, isOctDigit, ord)
+import Options.Applicative
 import Numeric (readOct)
 import qualified Data.Map.Strict as M
 import qualified Data.ByteString.Char8 as B
+import Data.Version (showVersion, Version)
 
 split :: Eq a => a -> [a] -> [[a]]
 split e s
@@ -21,6 +24,13 @@ split e s
 
 escapeSequences :: M.Map String Char
 escapeSequences = M.fromList [("\\\\", '\\'),("\\a", chr 7),("\\b", chr 8),("\\f", chr 12),("\\n", chr 10),("\\r", chr 13),("\\t", chr 9),("\\v", chr 11)]
+
+versionOption :: String -> Version -> Parser (a -> a)
+versionOption n v =
+    infoOption (n ++ " (Mrak coreutils) " ++ showVersion v)
+    ( long "version"
+    <> help "output version information and exit"
+    )
 
 unrange :: String -> String
 unrange [] = []
