@@ -50,6 +50,13 @@ executable tr
   default-language: Haskell2010
   ghc-options:      -Wall
 
+executable true
+  main-is:          Main.hs
+  hs-source-dirs:   src/true
+  build-depends:    base >=4.8 && <4.9
+  default-language: Haskell2010
+  ghc-options:      -Wall
+
 executable wc
   main-is:          Main.hs
   hs-source-dirs:   src/wc
