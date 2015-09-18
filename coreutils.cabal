@@ -63,6 +63,16 @@ executable wc
   default-language: Haskell2010
   ghc-options:      -Wall
 
+executable yes
+  main-is:          Main.hs
+  hs-source-dirs:   src/yes
+  other-modules:    Yes,
+                    Args
+  build-depends:    optparse-applicative,
+                    base >=4.8 && <4.9
+  default-language: Haskell2010
+  ghc-options:      -Wall
+
 test-suite unit
   type:             exitcode-stdio-1.0
   main-is:          Main.hs

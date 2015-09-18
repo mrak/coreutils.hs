@@ -22,9 +22,6 @@ split e s
 escapeSequences :: M.Map String Char
 escapeSequences = M.fromList [("\\\\", '\\'),("\\a", chr 7),("\\b", chr 8),("\\f", chr 12),("\\n", chr 10),("\\r", chr 13),("\\t", chr 9),("\\v", chr 11)]
 
-derepeat :: String -> String
-derepeat = undefined
-
 unrange :: String -> String
 unrange [] = []
 unrange s@[_] = s
