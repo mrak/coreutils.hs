@@ -6,6 +6,6 @@ import Control.Monad (forever)
 yes :: A.Args -> IO ()
 yes a = do
     let s = case A.strings a of
-                  Nothing -> "yes"
+                  Nothing -> "y"
                   Just ss -> unwords ss
     forever $ putStrLn s
