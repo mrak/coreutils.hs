@@ -1,8 +1,11 @@
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Coreutils ( unescape
-                 , unescapeBS
                  , unrange
                  , split
+                 , bsContents
+                 , bsContents'
+                 , bsUnlines
+                 , bsUnlines'
                  , versionOption
                  ) where
 
@@ -10,8 +13,23 @@ import Data.Char (chr, isOctDigit, ord)
 import Options.Applicative
 import Numeric (readOct)
 import qualified Data.Map.Strict as M
-import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Data.ByteString.Char8 as B'
 import Data.Version (showVersion, Version)
+
+bsContents :: FilePath -> IO B.ByteString
+bsContents "-" = B.getContents
+bsContents f   = B.readFile f
+
+bsContents' :: FilePath -> IO B'.ByteString
+bsContents' "-" = B'.getContents
+bsContents' f   = B'.readFile f
+
+bsUnlines :: [B.ByteString] -> B.ByteString
+bsUnlines = B.intercalate "\n"
+
+bsUnlines' :: [B'.ByteString] -> B'.ByteString
+bsUnlines' = B'.intercalate "\n"
 
 split :: Eq a => a -> [a] -> [[a]]
 split e s
@@ -59,13 +77,3 @@ unescape s = head s : unescape (tail s)
 
 octToChar :: String -> Char
 octToChar = chr . fst . head . readOct
-
-unescapeBS :: B.ByteString -> B.ByteString
-unescapeBS (B.uncons -> Nothing) = B.empty
-unescapeBS (B.uncons -> Just (x, B.uncons -> Nothing)) = B.singleton x
-unescapeBS (B.uncons -> Just ('\\', B.uncons -> Just (y, zs))) =
-    case M.lookup ['\\',y] escapeSequences of
-         Nothing -> '\\' `B.cons` unescapeBS (y `B.cons` zs)
-         Just c -> c `B.cons` unescapeBS zs
-
-unescapeBS bs = B.head bs `B.cons` unescapeBS (B.tail bs)

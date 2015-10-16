@@ -43,9 +43,22 @@ executable base64
 executable cat
   main-is:          Main.hs
   hs-source-dirs:   src/cat
-  other-modules:    Cat
+  other-modules:    Cat,
                     Args
-  build-depends:    optparse-applicative,
+  build-depends:    coreutils,
+                    optparse-applicative,
+                    bytestring,
+                    base >=4.8 && <4.9
+  default-language: Haskell2010
+  ghc-options:      -Wall
+
+executable head
+  main-is:          Main.hs
+  hs-source-dirs:   src/head
+  other-modules:    Head,
+                    Args
+  build-depends:    coreutils,
+                    optparse-applicative,
                     bytestring,
                     base >=4.8 && <4.9
   default-language: Haskell2010

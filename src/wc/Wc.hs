@@ -9,7 +9,7 @@ import Data.Maybe (isJust, fromJust)
 import Data.Monoid
 import Data.List (intersperse)
 import Data.Char (chr)
-import Coreutils (split)
+import Coreutils (split, bsContents)
 
 wc :: A.Args -> IO ()
 wc args = case A.files0from args of
@@ -25,9 +25,7 @@ doFiles :: A.Args -> [FilePath] -> IO ()
 doFiles args fs = putStr . unlines . label fs . total . map (wc' args) =<< readFiles fs
 
 readFiles :: [FilePath] -> IO [B.ByteString]
-readFiles = mapM fn where
-    fn "-" = B.getContents
-    fn f   = B.readFile f
+readFiles = mapM bsContents
 
 files0from :: FilePath -> IO [FilePath]
 files0from "-" = fmap (split (chr 0)) getContents
