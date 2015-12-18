@@ -29,7 +29,7 @@ library
 executable base64
   main-is:          Main.hs
   hs-source-dirs:   src/base64
-  other-modules:    Base64
+  other-modules:    Base64,
                     Args
   build-depends:    optparse-applicative,
                     base64-bytestring,
