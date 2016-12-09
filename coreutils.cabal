@@ -22,7 +22,7 @@ library
   build-depends:    containers,
                     bytestring,
                     optparse-applicative,
-                    base >=4.8 && <4.9
+                    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
@@ -36,7 +36,7 @@ executable base64
                     bytestring,
                     coreutils,
                     pipes,
-                    base >=4.8 && <4.9
+                    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
@@ -48,7 +48,7 @@ executable cat
   build-depends:    coreutils,
                     optparse-applicative,
                     bytestring,
-                    base >=4.8 && <4.9
+                    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
@@ -60,7 +60,7 @@ executable head
   build-depends:    coreutils,
                     optparse-applicative,
                     bytestring,
-                    base >=4.8 && <4.9
+                    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
@@ -74,14 +74,14 @@ executable tr
                     bytestring,
                     pipes,
                     optparse-applicative,
-                    base >=4.8 && <4.9
+                    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
 executable true
   main-is:          Main.hs
   hs-source-dirs:   src/true
-  build-depends:    base >=4.8 && <4.9
+  build-depends:    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
@@ -91,7 +91,7 @@ executable uniq
   other-modules:    Uniq,
                     Args
   build-depends:    optparse-applicative,
-                    base >=4.8 && <4.9
+                    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
@@ -104,7 +104,7 @@ executable wc
                     text,
                     bytestring,
                     optparse-applicative,
-                    base >=4.8 && <4.9
+                    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
@@ -114,7 +114,7 @@ executable yes
   other-modules:    Yes,
                     Args
   build-depends:    optparse-applicative,
-                    base >=4.8 && <4.9
+                    base >=4.9 && <4.10
   default-language: Haskell2010
   ghc-options:      -Wall
 
@@ -133,5 +133,5 @@ test-suite unit
                     bytestring,
                     containers,
                     optparse-applicative,
-                    base >= 4.8 && <4.9
+                    base >= 4.8 && <4.10
   default-language: Haskell2010
